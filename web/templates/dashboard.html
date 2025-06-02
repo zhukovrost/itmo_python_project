@@ -1,0 +1,186 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Панель управления</title>
+    <link href="/static/css/global.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/dashboard.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700&family=Roboto:wght@400;500&family=Material+Icons+Round&display=swap" rel="stylesheet">
+    <script src="https://cdn.anychart.com/releases/8.0.0/js/anychart-base.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.0.0/themes/dark_earth.min.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="sidebar-wrap">
+      <div class="sidebar-mobile-background" onClick="toggleNav()"></div>
+      <div class="sidebar-mobile">
+        <div class="sidebar-ham" onClick="toggleNav()">
+          <div class="ham-1"></div>
+          <div class="ham-2"></div>
+        </div>
+        <p class="mobile-app-name">Привычки</p>
+      </div>
+      <div class="sidebar">
+        <div class="sidebar-inner-wrap">
+          <a class="sidebar-item active" href="/">
+            <i class="material-icons-round">dashboard</i>
+            <p>Панель</p>
+          </a>
+          {% for habit, _ in habits %}
+            <a class="sidebar-item" href="{{'/habit/' ~ habit.id}}">
+              <i class="material-icons-round">short_text</i>
+              <p>{{habit.title}}</p>
+            </a>
+          {% endfor %}
+          <a class="sidebar-item add-habit" href="/add_habit">
+            <i class="material-icons-round">add</i>
+            <p>Добавить привычку</p>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="main-content">
+
+        <!-- Активные привычки -->
+        <div class="content">
+          <div class="header-wrap">
+              <div id="date">
+              <h1>{{ date }}</h1>
+              </div>
+
+              <div id="info">
+                <p> Привет, {{user.username}}! </p>
+                <a class="button logout" href="{{ url_for('logout') }}">Выйти</a>
+              </div>
+          </div>
+
+          <div id="NavBar">
+              <hr>
+              <form action={{ url_for('dashboard', current_date=date) }} method="POST">
+                  <!-- Кнопка "вчера" -->
+                  <button class="button yesterday" type="submit" alt="вчера" name="increment" value="previous">
+                      &#8249;
+                  </button>
+
+                  <!-- Кнопка "сегодня" -->
+                  <button class="button today" name="increment" value="today" type="submit">СЕГОДНЯ</button>
+
+                  <!-- Кнопка "завтра" -->
+                  <button class="button tomorrow" type="submit" alt="завтра" name="increment" value="next">
+                      &#8250;
+                  </button>
+              </form>
+          </div>
+
+            <h3>
+                <strong>
+                    Активные привычки
+                </strong>
+            <br>
+            </h3>
+
+            <!-- Невыполненные -->
+            <form method="POST">
+                {% for habit, log in habits %}
+                    {% if not log.status %}
+                    <div class="habit">
+                        <input type="checkbox" id="{{log.id}}" name="done" value="{{log.id}}">
+                        <p>
+                            <label for="{{log.id}}">
+                            <a style="color:#AFEEEE; font-size: 20px" href="{{ url_for('habit', habit_id=habit.id) }}" class="title">
+                                {{habit.title}}
+                            </a>
+                            </label>
+                        </p>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                <button class="button check" type="submit" name="Submit" >Отметить как выполненное</button>
+            </form>
+
+            <!-- Выполненные -->
+            <form method="POST">
+                {% for habit, log in habits %}
+                    {% if log.status %}
+                    <div class="habit">
+                        <input type="checkbox" id="{{log.id}}" name="undo-done" value="{{log.id}}">
+                        <p>
+                            <label for="{{log.id}}">
+                            <a style="color:#AFEEEE; font-size: 20px" href="{{ url_for('habit', habit_id=habit.id) }}" class="title">
+                                <s>{{habit.title}}</s>
+                            </a>
+                            </label>
+                        </p>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                <button class="button check" type="submit" name="Submit" >Отменить отметку</button>
+            </form>
+        </div>
+
+        <!-- Прогресс за день -->
+        <div class="content">
+            <h1>Ваш прогресс за сегодня</h1>
+            <hr>
+            <div id="container" style="width: 100%; height: 100%"></div>
+              <script>
+                anychart.onDocumentReady(function() {
+                  anychart.theme(anychart.themes.darkEarth);
+                  var data = {
+                      header: ["День", "Прогресс"],
+                      rows: [
+                        ["К выполнению", "{{count['todo']}}"],
+                        ["Выполнено", "{{count['completed']}}"]
+                  ]};
+                  var chart = anychart.column();
+                  chart.data(data);
+                  chart.container("container");
+                  chart.draw();
+                });
+              </script>
+        </div>
+
+        <!-- Прогресс за месяц-->
+        <div class="content">
+            <h1>Статистика за последние 30 дней</h1>
+            <hr>
+            <div id="container1" style="width: 100%; height: 100%"></div>
+              <script>
+                anychart.onDocumentReady(function() {
+                  anychart.theme(anychart.themes.darkEarth);
+                  var data = {
+                      header: ["День", "Прогресс"],
+                      rows: [
+                        ["Пропущено", "{{count_month['todo']}}"],
+                        ["Выполнено", "{{count_month['completed']}}"]
+                  ]};
+                  var chart = anychart.column();
+                  chart.data(data);
+                  chart.container("container1");
+                  chart.draw();
+                });
+              </script>
+        </div>
+    </div>
+
+    <p>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {{ messages[0] }}
+      {% endif %}
+    {% endwith %}
+    </p>
+</body>
+<script>
+  let navOn = false;
+  toggleNav = function() {
+    navOn = !navOn;
+    if (navOn) {
+      document.getElementById('sidebar-wrap').classList.add('on');
+    } else {
+      document.getElementById('sidebar-wrap').classList.remove('on');
+    }
+  }
+</script>
+</html>
+

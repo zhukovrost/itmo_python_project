@@ -1,0 +1,83 @@
+#date {
+    float: left;
+    clear: left;
+}
+
+#info {
+    float: right;
+    display: flex;
+    align-items: center;
+    clear: right;
+    padding-bottom: 0.1em;
+}
+
+#info>p {
+  margin-right: 0.8em;
+}
+
+.desc:hover {
+    background-color: aqua;
+}
+
+.button {
+    -webkit-appearance: none;
+    border: none;
+    width: auto;
+    vertical-align: middle;
+}
+
+.button.check {
+    background-color: #4c333700;
+    color: white;
+    padding: 12px 24px;
+    border: 2px solid white;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 5px;
+}
+
+.button:active {
+    box-shadow: 0 5px #666;
+    transform: translateY(2px);
+}
+
+.button.yesterday, .button.tomorrow {
+    background: transparent;
+    color: white;
+}
+
+.button.today {
+    background: transparent;
+    color: #FFFFFF;
+    font-family: auto;
+    font-size: 24px;
+    text-align: center;
+}
+
+.button:hover {
+    background-color: white;
+    color: black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.habit p {
+    display: inline-block;
+}
+
+.addhabit {
+    background-color: blue;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4CAF50;
+  cursor: pointer;
+}
+
+@media screen{
+}
